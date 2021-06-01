@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html ng-app="index" ng-controller="indexController">
+    <head>
+    
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta http-equiv="x-ua-compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi"/>
+        <meta name="mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <link rel="stylesheet" type="text/css" href="webjars/simonwep__pickr/1.2.6/dist/themes/monolith.min.css"/>
+        <link rel="stylesheet" type="text/css" href="app.css?v=1.1.0">
+        <title ng-bind="page.title | translate"></title>
+    </head>
+    <body ng-class="page.bodyClassName">
+
+        <div ng-if="!fatalError">
+
+            <!-- Content for logged-in users -->
+            <div ng-if="!expectedCredentials">
+
+                <!-- Global status/error dialog -->
+                <div ng-class="{shown: guacNotification.getStatus()}" class="status-outer">
+                    <div class="status-middle">
+                        <guac-notification notification="guacNotification.getStatus()"></guac-notification>
+                    </div>
+                </div>
+
+                <div id="content" style="width:1024;height:768;" ng-view>
+                </div>
+
+            </div>
+
+            <!-- Login screen for logged-out users -->
+            <guac-login ng-show="expectedCredentials"
+                        help-text="loginHelpText"
+                        form="expectedCredentials"
+                        values="acceptedCredentials"></guac-login>
+
+        </div>
+
+        <!-- Absolute fatal error -->
+        <div ng-if="fatalError" ng-class="{shown: fatalError}" class="fatal-page-error-outer">
+            <div class="fatal-page-error-middle">
+                <div class="fatal-page-error">
+                    <h1 translate="APP.DIALOG_HEADER_ERROR"></h1>
+                    <p translate="APP.ERROR_PAGE_UNAVAILABLE"></p>
+                </div>
+            </div>
+        </div>
+
+		<!-- 水印 -->
+        <script type="text/javascript">
+				//水印
+			function watermark_show(settings) {
+				// 默认设置
+				var defaultSettings={
+					watermark_txt: "",
+					watermark_x : 150,// 水印起始位置x轴坐标
+					watermark_y : 50,// 水印起始位置Y轴坐标
+					watermark_cols : 3,// 水印列数
+					watermark_rows : 4,// 水印行数
+					watermark_x_space : 350,// 水印x轴间隔
+					watermark_y_space : 60,// 水印y轴间隔
+					watermark_color : '#ffffff',// 水印字体颜色
+					watermark_alpha : 0.1,// 水印透明度
+					watermark_fontsize : '20px',// 水印字体大小
+					watermark_font : '微软雅黑',// 水印字体
+					watermark_width : 120,// 水印宽度
+					watermark_height : 70,// 水印长度
+					watermark_angle : 20// 水印倾斜度数
+				};
+				// 采用配置项替换默认值，作用类似jquery.extend
+				if(arguments.length===1&&typeof arguments[0] ==="object" )
+				{
+					var src=arguments[0]||{};
+					for(key in src)
+					{
+						if(src[key]&&defaultSettings[key]&&src[key]===defaultSettings[key])
+							continue;
+						else if(src[key])
+							defaultSettings[key]=src[key];
+					}
+				}
+			// alert(1);
+				var oTemp = document.createDocumentFragment();
+
+				//获取页面最大宽度
+				var page_width = Math.max(document.body.scrollWidth,document.body.clientWidth,window.screen.width);
+
+				//获取页面最大长度
+				var page_height = Math.max(document.body.scrollHeight,document.body.clientHeight,window.screen.height);
+				// alert();
+
+				// 如果将水印列数设置为0，或水印列数设置过大，超过页面最大宽度，则重新计算水印列数和水印x轴间隔
+				if (defaultSettings.watermark_cols == 0 || (parseInt(defaultSettings.watermark_x + defaultSettings.watermark_width *defaultSettings.watermark_cols + defaultSettings.watermark_x_space * (defaultSettings.watermark_cols - 1)) > page_width)) {
+					defaultSettings.watermark_cols = parseInt((page_width-defaultSettings.watermark_x+defaultSettings.watermark_x_space) / (defaultSettings.watermark_width + defaultSettings.watermark_x_space));
+					defaultSettings.watermark_x_space = parseInt((page_width - defaultSettings.watermark_x - defaultSettings.watermark_width * defaultSettings.watermark_cols) / (defaultSettings.watermark_cols - 1));
+				}
+				// 如果将水印行数设置为0，或水印行数设置过大，超过页面最大长度，则重新计算水印行数和水印y轴间隔
+				if (defaultSettings.watermark_rows == 0 || (parseInt(defaultSettings.watermark_y + defaultSettings.watermark_height * defaultSettings.watermark_rows + defaultSettings.watermark_y_space * (defaultSettings.watermark_rows - 1)) > page_height)) {
+					defaultSettings.watermark_rows = parseInt((defaultSettings.watermark_y_space + page_height - defaultSettings.watermark_y) / (defaultSettings.watermark_height + defaultSettings.watermark_y_space));
+					defaultSettings.watermark_y_space = parseInt(((page_height - defaultSettings.watermark_y) - defaultSettings.watermark_height * defaultSettings.watermark_rows) / (defaultSettings.watermark_rows - 1));
+				}
+				var x;
+				var y;
+				// alert(2);
+				for (var i = 0; i < defaultSettings.watermark_rows; i++) {
+					y = defaultSettings.watermark_y + (defaultSettings.watermark_y_space + defaultSettings.watermark_height) * i;
+					for (var j = 0; j < defaultSettings.watermark_cols; j++) {
+						x = defaultSettings.watermark_x + (defaultSettings.watermark_width + defaultSettings.watermark_x_space) * j;
+
+						var mask_div = document.createElement('div');
+						mask_div.id = 'mask_div' + i + j;
+						mask_div.appendChild(document.createTextNode(defaultSettings.watermark_txt));
+						// 设置水印div倾斜显示
+						mask_div.style.webkitTransform = "rotate(-" + defaultSettings.watermark_angle + "deg)";
+						mask_div.style.MozTransform = "rotate(-" + defaultSettings.watermark_angle + "deg)";
+						mask_div.style.msTransform = "rotate(-" + defaultSettings.watermark_angle + "deg)";
+						mask_div.style.OTransform = "rotate(-" + defaultSettings.watermark_angle + "deg)";
+						mask_div.style.transform = "rotate(-" + defaultSettings.watermark_angle + "deg)";
+						mask_div.style.visibility = "";
+						// mask_div.style.user-select = "none";
+						mask_div.style.position = "absolute";
+						mask_div.style.left = x + 'px';
+						mask_div.style.top = y + 'px';
+						mask_div.style.overflow = "hidden";
+						mask_div.style.zIndex = "9999";
+						// mask_div.style.border="solid #eee 1px";
+						mask_div.style.opacity = defaultSettings.watermark_alpha;
+						// mask_div.style.filter.alpha.opacity=10
+						//alpha(opacity=10)
+						mask_div.style.filter="alpha(opacity='10')";
+						// mask_div.style.filter.progid="DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=0.7660444431189777, M12=-0.6427876096865394, M21=0.6427876096865398, M22=0.7660444431189779)";
+						mask_div.style.fontSize = defaultSettings.watermark_fontsize;
+						mask_div.style.fontFamily = defaultSettings.watermark_font;
+						mask_div.style.color = defaultSettings.watermark_color;
+						// mask_div.style.progid="DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11=0.866025404, M12=0.5, M21=-0.5, M22=0.866025404)" ;
+						// mask_div.style.textAlign = "center";
+						//mask_div.style.user-select = "none";
+						// mask_div.style.width = defaultSettings.watermark_width + 'px';
+						// mask_div.style.height = defaultSettings.watermark_height + 'px';
+						// mask_div.style.display = "block";
+						//$(mask_div).rotate({angle:45});
+						oTemp.appendChild(mask_div);
+					};
+				};
+				// alert(oTemp);
+				document.body.appendChild(oTemp);
+			}
+			watermark_show({ watermark_txt: "国泰网信", watermark_y: 30 ,watermark_cols:10,watermark_rows:20,watermark_x_space:100});
+
+        </script>
+
+        <!-- Reformat URL for AngularJS if query parameters are present -->
+        <script type="text/javascript" src="relocateParameters.js"></script>
+
+        <!-- Utility libraries -->
+        <script type="text/javascript" src="webjars/jquery/3.3.1/dist/jquery.min.js"></script>
+        <script type="text/javascript" src="webjars/lodash/4.17.10/dist/lodash.min.js"></script>
+
+        <!-- AngularJS -->
+        <script type="text/javascript" src="webjars/angular/1.6.9/angular.min.js"></script>
+        <script type="text/javascript" src="webjars/angular-route/1.6.9/angular-route.min.js"></script>
+        <script type="text/javascript" src="webjars/angular-touch/1.6.9/angular-touch.min.js"></script>
+
+        <!-- Internationalization -->
+        <script type="text/javascript" src="webjars/messageformat/1.0.2/messageformat.min.js"></script>
+        <script type="text/javascript" src="webjars/angular-translate/2.16.0/angular-translate.min.js"></script>
+        <script type="text/javascript" src="webjars/angular-translate-interpolation-messageformat/2.16.0/angular-translate-interpolation-messageformat.min.js"></script>
+        <script type="text/javascript" src="webjars/angular-translate-loader-static-files/2.16.0/angular-translate-loader-static-files.min.js"></script>
+
+        <!-- JSTZ -->
+        <script type="text/javascript" src="webjars/jstz/1.0.10/dist/jstz.min.js"></script>
+
+        <!-- Pickr (color picker) -->
+        <script type="text/javascript" src="webjars/simonwep__pickr/1.2.6/dist/pickr.es5.min.js"></script>
+
+        <!-- Polyfills for the "datalist" element, Blob and the FileSaver API -->
+        <script type="text/javascript" src="webjars/blob-polyfill/1.0.20150320/Blob.js"></script>
+        <script type="text/javascript" src="webjars/datalist-polyfill/1.14.0/datalist-polyfill.min.js"></script>
+        <script type="text/javascript" src="webjars/filesaver/1.3.3/FileSaver.min.js"></script>
+
+        <!-- Allow arbitrary ordering of Angular module creation and retrieval -->
+        <script type="text/javascript" src="webjars/angular-module-shim/0.0.4/angular-module-shim.js"></script>
+
+        <!-- Web application -->
+        <script type="text/javascript" src="jquery.base64.js"></script>
+        
+        <script type="text/javascript" src="guacamole.js"></script>
+
+    </body>
+</html>
